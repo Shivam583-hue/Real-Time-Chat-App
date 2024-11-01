@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "server": "tsc -b backend && node backend/dist/index.js"
+    "server": "tsc -b backend && node backend/dist/index.js",
+    "git" : "git add . && git commit -m {`a`}"
   },
   "keywords": [],
   "author": "",
