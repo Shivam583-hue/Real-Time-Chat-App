@@ -6,7 +6,7 @@ const useSendMessage = () => {
 	const [loading, setLoading] = useState(false);
 	const { messages, setMessages, selectedConversation } = useConversation();
 
-	const sendMessage = async (message:any) => {
+	const sendMessage = async (message: string) => {
 		setLoading(true);
 		try {
 			const res = await fetch(`/api/messages/send/${selectedConversation?._id}`, {

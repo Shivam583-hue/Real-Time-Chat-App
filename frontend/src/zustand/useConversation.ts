@@ -10,6 +10,8 @@ export interface User {
 
 export interface Conversation {
     _id: string;
+    fullName: string;
+    username: string;
     senderId: string;
     receiverId: string;
     userToChatId: string;

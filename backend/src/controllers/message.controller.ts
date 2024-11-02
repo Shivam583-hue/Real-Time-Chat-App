@@ -1,6 +1,7 @@
 import express,{Request,Response} from "express"
 import Conversation from "../models/conversation.model";
 import Message from "../models/message.model";
+import { getReceiverSocketId, io } from "../socket/socket";
 
 export const sendMessage = (async (req: Request, res: Response) => {
     try {
@@ -34,7 +35,14 @@ export const sendMessage = (async (req: Request, res: Response) => {
 
         await Promise.all([conversation.save(), newMessage.save()]);
 
-        res.status(201).json({ message: newMessage, conversationId: conversation._id });
+        //Socket logic 
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if(receiverSocketId){
+            // used to send events to a specific client
+            io.to(receiverSocketId).emit("newMessage",newMessage);  
+        }
+
+        res.status(201).json(newMessage);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });
@@ -46,15 +54,12 @@ export const getMessages = (async (req: Request, res: Response) => {
     try {
         const { id: userToChatId } = req.params;
         const senderId = req.user._id;
-        console.log(req.user)
+        
 
         const conversation = await Conversation.findOne({
             participants: { $all: [senderId, userToChatId] }
         }).populate("messages").exec();
         
-
-        console.log("Found Conversation :", conversation);
-        console.log("Messages : ",conversation?.messages)
 
         if (!conversation) {
             return res.status(404).json({ 

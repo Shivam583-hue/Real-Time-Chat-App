@@ -3,9 +3,11 @@ import useGetMessages from "../../hooks/useGetMessages";
 import MessageSkeleton from "../Skeletons/MessageSkeleton";
 import Message from "./Message";
 import { Message as MessageType } from '../../zustand/useConversation';
+import useListenMessages from "../../hooks/useListenMessages";
 
 const Messages = () => {
-  const { messages, loading } = useGetMessages(); // Assuming this is of type Message[]
+  const { messages, loading } = useGetMessages(); 
+  useListenMessages();
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -20,8 +22,8 @@ const Messages = () => {
     <div className='px-4 flex-1 overflow-auto'>
       {!loading &&
         Array.isArray(messages) &&
-        messages.map((message: MessageType, index: number) => { // 
-          if (!message || typeof message.message !== 'string') {
+        messages.map((message: MessageType, index: number) => {
+          if (!message || typeof message !== 'object' || !('message' in message)) {
             console.error('Invalid message object in array:', message);
             return null;
           }

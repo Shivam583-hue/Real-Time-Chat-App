@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMessages = exports.sendMessage = void 0;
 const conversation_model_1 = __importDefault(require("../models/conversation.model"));
 const message_model_1 = __importDefault(require("../models/message.model"));
+const socket_1 = require("../socket/socket");
 exports.sendMessage = ((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { message } = req.body;
@@ -40,7 +41,13 @@ exports.sendMessage = ((req, res) => __awaiter(void 0, void 0, void 0, function*
             conversation.messages.push(newMessage._id);
         }
         yield Promise.all([conversation.save(), newMessage.save()]);
-        res.status(201).json({ message: newMessage, conversationId: conversation._id });
+        //Socket logic 
+        const receiverSocketId = (0, socket_1.getReceiverSocketId)(receiverId);
+        if (receiverSocketId) {
+            // used to send events to a specific client
+            socket_1.io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
+        res.status(201).json(newMessage);
     }
     catch (error) {
         console.log(error);
@@ -51,12 +58,9 @@ exports.getMessages = ((req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const { id: userToChatId } = req.params;
         const senderId = req.user._id;
-        console.log(req.user);
         const conversation = yield conversation_model_1.default.findOne({
             participants: { $all: [senderId, userToChatId] }
         }).populate("messages").exec();
-        console.log("Found Conversation :", conversation);
-        console.log("Messages : ", conversation === null || conversation === void 0 ? void 0 : conversation.messages);
         if (!conversation) {
             return res.status(404).json({
                 error: "Conversation not found",

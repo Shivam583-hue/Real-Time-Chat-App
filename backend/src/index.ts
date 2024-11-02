@@ -5,9 +5,10 @@ import messageRoutes from "./routes/message.route"
 import userRoutes from "./routes/user.route"
 import connecttoDb from "./db/connectFile"
 import cookieParser from "cookie-parser"
+import { app, server } from "./socket/socket"
 dotenv.config()
 
-const app = express()
+
 const PORT = process.env.PORT
 
 app.use(express.json())
@@ -21,7 +22,7 @@ app.use("/api/users",userRoutes)
 // })
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     connecttoDb()
     console.log(`Server Running on port ${PORT} `)
 })
