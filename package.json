@@ -2,9 +2,10 @@
   "name": "realtimechatapptt",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "server": "tsc -b backend && node backend/dist/index.js",
-    "start": "npm run server",
+    "start": "node backend/dist/index.js",  
     "build": "npm install && npm install --prefix frontend &&  npm run build --prefix frontend"
   },
   "keywords": [],

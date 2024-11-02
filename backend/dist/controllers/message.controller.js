@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,15 +7,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMessages = exports.sendMessage = void 0;
-const conversation_model_1 = __importDefault(require("../models/conversation.model"));
-const message_model_1 = __importDefault(require("../models/message.model"));
-const socket_1 = require("../socket/socket");
-exports.sendMessage = ((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+import Conversation from "../models/conversation.model.js";
+import Message from "../models/message.model.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
+export const sendMessage = ((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { message } = req.body;
         const { id: receiverId } = req.params;
@@ -24,15 +18,15 @@ exports.sendMessage = ((req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!message || message.trim() === "") {
             return res.status(400).json({ error: "Message cannot be empty." });
         }
-        let conversation = yield conversation_model_1.default.findOne({
+        let conversation = yield Conversation.findOne({
             participants: { $all: [senderId, receiverId] }
         });
         if (!conversation) {
-            conversation = yield conversation_model_1.default.create({
+            conversation = yield Conversation.create({
                 participants: [senderId, receiverId]
             });
         }
-        const newMessage = new message_model_1.default({
+        const newMessage = new Message({
             senderId,
             receiverId,
             message,
@@ -42,10 +36,10 @@ exports.sendMessage = ((req, res) => __awaiter(void 0, void 0, void 0, function*
         }
         yield Promise.all([conversation.save(), newMessage.save()]);
         //Socket logic 
-        const receiverSocketId = (0, socket_1.getReceiverSocketId)(receiverId);
+        const receiverSocketId = getReceiverSocketId(receiverId);
         if (receiverSocketId) {
             // used to send events to a specific client
-            socket_1.io.to(receiverSocketId).emit("newMessage", newMessage);
+            io.to(receiverSocketId).emit("newMessage", newMessage);
         }
         res.status(201).json(newMessage);
     }
@@ -54,11 +48,11 @@ exports.sendMessage = ((req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(500).json({ error: "Internal server error" });
     }
 }));
-exports.getMessages = ((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const getMessages = ((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id: userToChatId } = req.params;
         const senderId = req.user._id;
-        const conversation = yield conversation_model_1.default.findOne({
+        const conversation = yield Conversation.findOne({
             participants: { $all: [senderId, userToChatId] }
         }).populate("messages").exec();
         if (!conversation) {

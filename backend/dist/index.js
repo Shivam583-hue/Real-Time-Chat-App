@@ -1,27 +1,28 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const dotenv_1 = __importDefault(require("dotenv"));
-const auth_route_1 = __importDefault(require("./routes/auth.route"));
-const message_route_1 = __importDefault(require("./routes/message.route"));
-const user_route_1 = __importDefault(require("./routes/user.route"));
-const connectFile_1 = __importDefault(require("./db/connectFile"));
-const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const socket_1 = require("./socket/socket");
-dotenv_1.default.config();
+import path from "path";
+import express from "express";
+import dotenv from "dotenv";
+import authRoutes from "./routes/auth.route.js";
+import messageRoutes from "./routes/message.route.js";
+import userRoutes from "./routes/user.route.js";
+import connecttoDb from "./db/connectFile.js";
+import cookieParser from "cookie-parser";
+import { app, server } from "./socket/socket.js";
+dotenv.config();
 const PORT = process.env.PORT;
-socket_1.app.use(express_1.default.json());
-socket_1.app.use((0, cookie_parser_1.default)());
-socket_1.app.use("/api/auth", auth_route_1.default);
-socket_1.app.use("/api/messages", message_route_1.default);
-socket_1.app.use("/api/users", user_route_1.default);
+const __dirname = path.resolve();
+app.use(express.json());
+app.use(cookieParser());
+app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/users", userRoutes);
+app.use(express.static(path.join(__dirname, "frontend/dist")));
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+});
 // app.get('/',(req,res)=> {
 //     res.send("Server is running")
 // })
-socket_1.server.listen(PORT, () => {
-    (0, connectFile_1.default)();
+server.listen(PORT, () => {
+    connecttoDb();
     console.log(`Server Running on port ${PORT} `);
 });

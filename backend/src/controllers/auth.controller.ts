@@ -1,7 +1,7 @@
 import express,{ Request,Response,RequestHandler } from "express"
-import User from "../models/user.model";
+import User from "../models/user.model.js";
 import bcrypt from "bcryptjs"
-import generateTokenAndSetCookie from "../utils/generateToken";
+import generateTokenAndSetCookie from "../utils/generateToken.js";
 
 export const signup = (async(req:Request,res:Response) => {
     try {

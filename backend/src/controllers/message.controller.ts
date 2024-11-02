@@ -1,7 +1,7 @@
 import express,{Request,Response} from "express"
-import Conversation from "../models/conversation.model";
-import Message from "../models/message.model";
-import { getReceiverSocketId, io } from "../socket/socket";
+import Conversation from "../models/conversation.model.js";
+import Message from "../models/message.model.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const sendMessage = (async (req: Request, res: Response) => {
     try {

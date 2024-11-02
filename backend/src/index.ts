@@ -2,12 +2,12 @@
 import path from "path"
 import express from "express"
 import dotenv from "dotenv"
-import authRoutes from "./routes/auth.route"
-import messageRoutes from "./routes/message.route"
-import userRoutes from "./routes/user.route"
-import connecttoDb from "./db/connectFile"
+import authRoutes from "./routes/auth.route.js"
+import messageRoutes from "./routes/message.route.js"
+import userRoutes from "./routes/user.route.js"
+import connecttoDb from "./db/connectFile.js"
 import cookieParser from "cookie-parser"
-import { app, server } from "./socket/socket"
+import { app, server } from "./socket/socket.js"
 dotenv.config()
 
 
@@ -23,7 +23,7 @@ app.use("/api/users",userRoutes)
 app.use(express.static(path.join(__dirname,"frontend/dist")))
 
 app.get("*",(req,res)=>{
-    res.sendFile(path.resolve(__dirname,"frontend","dist","index.html"))
+    res.sendFile(path.resolve(__dirname,"frontend","dist","index.html"))x
 })
 
 // app.get('/',(req,res)=> {
