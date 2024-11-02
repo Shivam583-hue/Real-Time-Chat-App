@@ -1,12 +1,12 @@
+import ReactDOM from 'react-dom'
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
 import './index.scss'
 import App from './App.tsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthContextProvider } from './context/AuthContext.tsx'
 import { SocketContextProvider } from './context/SocketContext.tsx'
 
-createRoot(document.getElementById('root')!).render(
+ReactDOM.render(
   <StrictMode>
     <BrowserRouter>
       <AuthContextProvider>
@@ -16,4 +16,5 @@ createRoot(document.getElementById('root')!).render(
       </AuthContextProvider>
     </BrowserRouter>
   </StrictMode>,
+  document.getElementById('root')
 )
