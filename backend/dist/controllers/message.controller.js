@@ -20,8 +20,11 @@ exports.sendMessage = ((req, res) => __awaiter(void 0, void 0, void 0, function*
         const { message } = req.body;
         const { id: receiverId } = req.params;
         const senderId = req.user._id;
+        if (!message || message.trim() === "") {
+            return res.status(400).json({ error: "Message cannot be empty." });
+        }
         let conversation = yield conversation_model_1.default.findOne({
-            particapants: { $all: [senderId, receiverId] }
+            participants: { $all: [senderId, receiverId] }
         });
         if (!conversation) {
             conversation = yield conversation_model_1.default.create({
@@ -37,7 +40,7 @@ exports.sendMessage = ((req, res) => __awaiter(void 0, void 0, void 0, function*
             conversation.messages.push(newMessage._id);
         }
         yield Promise.all([conversation.save(), newMessage.save()]);
-        res.status(201).json(newMessage);
+        res.status(201).json({ message: newMessage, conversationId: conversation._id });
     }
     catch (error) {
         console.log(error);
@@ -48,14 +51,20 @@ exports.getMessages = ((req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const { id: userToChatId } = req.params;
         const senderId = req.user._id;
+        console.log(req.user);
         const conversation = yield conversation_model_1.default.findOne({
             participants: { $all: [senderId, userToChatId] }
-        }).populate("messages");
+        }).populate("messages").exec();
+        console.log("Found Conversation :", conversation);
+        console.log("Messages : ", conversation === null || conversation === void 0 ? void 0 : conversation.messages);
         if (!conversation) {
             return res.status(404).json({
                 error: "Conversation not found",
-                messages: []
+                messages: [""]
             });
+        }
+        if (!conversation.messages || conversation.messages.length === 0) {
+            return res.status(200).json([""]);
         }
         res.status(200).json(conversation.messages);
     }

@@ -22,7 +22,7 @@ exports.signup = ((req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (password != confirmPassword) {
             return res.status(400).json({ error: "Passwords don't match" });
         }
-        const user = yield user_model_1.default.findOne(username);
+        const user = yield user_model_1.default.findOne({ username });
         if (user) {
             return res.status(400).json({ error: "User already exists" });
         }
@@ -36,8 +36,8 @@ exports.signup = ((req, res) => __awaiter(void 0, void 0, void 0, function* () {
             gender,
             profilePic: profilePic,
         });
-        (0, generateToken_1.default)(newUser._id, res);
         yield newUser.save();
+        (0, generateToken_1.default)(newUser._id, res);
         res.status(201).json({
             _id: newUser._id,
             fullName: newUser.fullName,

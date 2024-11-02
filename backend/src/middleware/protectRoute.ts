@@ -6,13 +6,13 @@ import User from "../models/user.model";
 declare global {
     namespace Express {
         interface Request {
-            user?: any; 
+            user?: any ; 
         }
     }
 }
 
 interface JwtPayload {
-    userId: any; 
+    userId: string; 
 }
 
 const protectRoute = (async (req: Request, res: Response, next: NextFunction) => {

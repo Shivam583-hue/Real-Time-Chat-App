@@ -9,7 +9,7 @@ export const signup = (async(req:Request,res:Response) => {
         if(password != confirmPassword){
             return res.status(400).json({error : "Passwords don't match"})
         }
-        const user = await User.findOne(username)
+        const user = await User.findOne({username})
         if(user){return res.status(400).json({error : "User already exists"})}
 
         //hash password  
@@ -24,8 +24,8 @@ export const signup = (async(req:Request,res:Response) => {
             profilePic: profilePic,
         })
 
-        generateTokenAndSetCookie(newUser._id,res)
         await newUser.save()
+        generateTokenAndSetCookie(newUser._id,res)
         res.status(201).json({
             _id:newUser._id,
             fullName: newUser.fullName,
