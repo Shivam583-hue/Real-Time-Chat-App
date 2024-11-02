@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom'
 import { StrictMode } from 'react'
-import './index.scss'
+import './index.css'
 import App from './App.tsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthContextProvider } from './context/AuthContext.tsx'
